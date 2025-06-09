@@ -70,7 +70,7 @@ You can modify them in the main.py or extend the login logic.
 
 📄 License
 
-MIT License – free to use and modify.
+GPLv3 License – free to use and modify.
 
 ⸻
 
