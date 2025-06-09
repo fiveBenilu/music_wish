@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Musikwunsch</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Helvetica Neue', 'Segoe UI', 'Noto Sans', sans-serif;
+            padding: 2rem;
+            background: #f4f4f4;
+            margin: 0;
+        }
+        header {
+            background: #000;
+            height: 80px;
+            margin: 0;
+            width: 100vw;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: "Orbitron", sans-serif;
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        .logo {
+            height: 95%;
+            max-height: 95%;
+            width: auto;
+        }
+        form {
+            max-width: 500px;
+            margin: 100px auto 60px auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            color: #444;
+            font-family: inherit;
+        }
+        textarea {
+            resize: vertical;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-weight: bold;
+            color: #444;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .checkbox-group input {
+            margin-right: 0.5rem;
+        }
+        .checkbox-group label {
+            color: #444;
+        }
+        button {
+            padding: 0.75rem;
+            width: 100%;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #555;
+        }
+        footer {
+            background: #f4f4f4;
+            text-align: center;
+            padding: 1rem 0;
+            font-size: 0.9rem;
+            color: #777;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="{{ url_for('static', filename='img/dj_bennet_logo.png') }}" alt="DJ Bennet Logo" class="logo">
+    </header>
+
+    <form method="POST">
+        <label for="name">Mein Name <span style="color: red;">*</span></label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="title">Titel <span style="color: red;">*</span></label>
+        <input type="text" id="title" name="title" required>
+
+        <label for="author">Interpret <span style="color: red;">*</span></label>
+        <input type="text" id="author" name="author" required>
+
+        <label for="comment">Kommentar</label>
+        <textarea id="comment" name="comment" rows="3"></textarea>
+
+        <div class="checkbox-group">
+            <input type="checkbox" id="consent" name="consent" required>
+            <label for="consent">Ich stimme der <span id="datenschutz-link" style="text-decoration: underline; cursor: pointer;">Verarbeitung</span> meiner Daten zu <span style="color: red;">*</span></label>
+        </div>
+
+        <button type="submit">Senden</button>
+    </form>
+
+    <div class="modal fade" id="datenschutzModal" tabindex="-1" aria-labelledby="datenschutzModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="datenschutzModalLabel">Datenschutzhinweis</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
+          </div>
+          <div class="modal-body">
+            Ich werde deine Daten nicht an Dritte weitergeben, sie aber extern auf Servern in einer Datenbank speichern. Die Daten werden nach 10 Tagen automatisch gelöscht. Du stimmst außerdem zu, dass eine KI die Liederauswahl analysiert, um zu prüfen, ob es sich um passende Genres handelt.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>&copy; Bennet Griese – All rights reserved</footer>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body">
+            Dein Musikwunsch wurde erfolgreich gesendet!
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+    </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.getElementById('datenschutz-link').addEventListener('click', () => {
+    const modal = new bootstrap.Modal(document.getElementById('datenschutzModal'));
+    modal.show();
+});
+
+document.querySelector("form").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const form = this;
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
+    const originalButtonHTML = form.querySelector("button[type=submit]").innerHTML;
+    form.querySelector("button[type=submit]").innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Wird gesendet...';
+    form.querySelector("button[type=submit]").disabled = true;
+
+    const formData = new FormData(form);
+    const response = await fetch(form.action || window.location.pathname, {
+        method: 'POST',
+        body: formData
+    });
+
+    if (response.ok) {
+        const toast = new bootstrap.Toast(document.getElementById("successToast"));
+        toast.show();
+        form.querySelector("button[type=submit]").innerHTML = originalButtonHTML;
+        form.querySelector("button[type=submit]").disabled = false;
+        form.reset();
+    } else {
+        alert("Es ist ein Fehler aufgetreten.");
+        form.querySelector("button[type=submit]").innerHTML = originalButtonHTML;
+        form.querySelector("button[type=submit]").disabled = false;
+    }
+});
+</script>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin – Musikwünsche</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Helvetica Neue', 'Segoe UI', 'Noto Sans', sans-serif;
+            margin: 0;
+            padding-top: 90px;
+            background: #f4f4f4;
+        }
+        header {
+            background: #000;
+            height: 80px;
+            width: 100vw;
+            box-sizing: border-box;
+            font-family: "Orbitron", sans-serif;
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        .logo {
+            height: 60px;
+            width: auto;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+        thead th {
+            background: #fafafa;
+            color: #333;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+        }
+        tbody td {
+            background: #fff;
+            vertical-align: middle;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95rem;
+        }
+        tbody tr {
+            transition: background 0.2s ease-in-out;
+        }
+        tbody tr:hover {
+            background: #f9f9f9;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            color: #444;
+        }
+        th {
+            background-color: #eee;
+        }
+        form {
+            display: inline;
+        }
+        button {
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #555;
+        }
+        footer {
+            background: #f4f4f4;
+            text-align: center;
+            padding: 1rem 0;
+            font-size: 0.9rem;
+            color: #777;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="d-flex align-items-center justify-content-start px-3">
+        <img src="{{ url_for('static', filename='img/dj_bennet_logo.png') }}" alt="DJ Bennet Logo" class="logo">
+        <button class="btn btn-outline-light ms-auto" data-bs-toggle="modal" data-bs-target="#configModal" style="margin-left:auto;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+                <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.159c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.469l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
+            </svg>
+        </button>
+    </header>
+
+    <div class="container">
+        <h2 class="mb-4">Eingereichte Musikwünsche</h2>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Titel</th>
+                        <th>Interpret</th>
+                        <th>Kommentar</th>
+                        <th>Zeitpunkt</th>
+                        <th class="text-center" title="AI Prediction">
+                            <span style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-stars" viewBox="0 0 16 16">
+                                  <path d="M7.5 1.018a.5.5 0 0 1 .992 0l.378 2.166a.5.5 0 0 0 .466.38l2.137.138a.5.5 0 0 1 .282.881l-1.642 1.36a.5.5 0 0 0-.158.51l.524 2.12a.5.5 0 0 1-.764.546L8 7.937l-1.715 1.182a.5.5 0 0 1-.764-.546l.524-2.12a.5.5 0 0 0-.158-.51L4.245 4.583a.5.5 0 0 1 .282-.88l2.137-.138a.5.5 0 0 0 .466-.38L7.5 1.018zM2.5 9.018a.5.5 0 0 1 .992 0l.378 2.166a.5.5 0 0 0 .466.38l2.137.138a.5.5 0 0 1 .282.881l-1.642 1.36a.5.5 0 0 0-.158.51l.524 2.12a.5.5 0 0 1-.764.546L3 15.937l-1.715 1.182a.5.5 0 0 1-.764-.546l.524-2.12a.5.5 0 0 0-.158-.51l-1.642-1.36a.5.5 0 0 1 .282-.881l2.137-.138a.5.5 0 0 0 .466-.38L2.5 9.018zm10 0a.5.5 0 0 1 .992 0l.378 2.166a.5.5 0 0 0 .466.38l2.137.138a.5.5 0 0 1 .282.881l-1.642 1.36a.5.5 0 0 0-.158.51l.524 2.12a.5.5 0 0 1-.764.546L13 15.937l-1.715 1.182a.5.5 0 0 1-.764-.546l.524-2.12a.5.5 0 0 0-.158-.51l-1.642-1.36a.5.5 0 0 1 .282-.881l2.137-.138a.5.5 0 0 0 .466-.38L12.5 9.018z"/>
+                                </svg>
+                                <span style="font-size: 0.9rem;">AI Prediction</span>
+                            </span>
+                        </th>
+                        <th>Aktion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for wish in wishes %}
+                    <tr>
+                        <td>{{ wish[1] }}</td>
+                        <td>{{ wish[2] }}</td>
+                        <td>{{ wish[3] }}</td>
+                        <td>{{ wish[4] }}</td>
+                        <td>{{ wish[5] }}</td>
+                        <td class="text-center">
+                            {% if wish[6] == 'geeignet' %}
+                                <span class="badge bg-success reason-badge" data-id="{{ wish[0] }}" style="cursor:pointer;">geeignet</span>
+                            {% elif wish[6] == 'ungeeignet' %}
+                                <span class="badge bg-danger reason-badge" data-id="{{ wish[0] }}" style="cursor:pointer;">ungeeignet</span>
+                            {% else %}
+                                <span class="badge bg-secondary">offen</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form method="POST" action="{{ url_for('delete_wish', wish_id=wish[0]) }}">
+                                <button type="submit">Löschen</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>&copy; Bennet Griese – All rights reserved</footer>
+
+    <div class="modal fade" id="configModal" tabindex="-1" aria-labelledby="configModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <form method="POST" action="{{ url_for('update_config') }}">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="configModalLabel">Event-Einstellungen</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="event_config" class="form-label">Beschreibung und gewünschte Genres</label>
+                <textarea class="form-control" id="event_config" name="event_config" rows="4" required></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-success">Speichern</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Socket.IO für automatische Aktualisierung -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+        socket.on('update_wishes', () => {
+            location.reload();
+        });
+    </script>
+    <script>
+      document.querySelectorAll('.reason-badge').forEach(badge => {
+        badge.addEventListener('click', async () => {
+          // Entferne alle existierenden Begründungsboxen
+          document.querySelectorAll('[id^="reason-box-"]').forEach(el => el.remove());
+
+          const id = badge.getAttribute('data-id');
+          const originalContent = badge.textContent;
+          badge.innerHTML = `<div class="spinner-border spinner-border-sm text-light" role="status"><span class="visually-hidden">Loading...</span></div>`;
+
+          try {
+            const res = await fetch(`/reason/${id}`);
+            const data = await res.json();
+            const reasonText = data.reason || 'Keine Begründung verfügbar.';
+
+            // Zurücksetzen
+            badge.textContent = originalContent;
+
+            const reasonBox = document.createElement('div');
+            reasonBox.className = 'border rounded p-2 mt-1 text-muted small';
+            reasonBox.style.background = '#f9f9f9';
+            reasonBox.style.borderColor = '#ccc';
+            reasonBox.id = `reason-box-${id}`;
+            reasonBox.textContent = reasonText;
+
+            // Füge das Feld direkt über dem Badge ein
+            const row = badge.closest('td');
+            row.appendChild(reasonBox);
+
+          } catch (e) {
+            badge.textContent = originalContent;
+            alert('Fehler beim Laden der Begründung.');
+          }
+        });
+      });
+    </script>
+</body>
+</html>
