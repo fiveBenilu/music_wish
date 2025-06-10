@@ -28,7 +28,7 @@
             z-index: 1000;
         }
         .logo {
-            height: 60px;
+            height: 100px;
             width: auto;
         }
         .container {
@@ -98,15 +98,73 @@
             color: #777;
             margin-top: 2rem;
         }
+        .speech-bubble {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            opacity: 0;
+            backdrop-filter: blur(6px);
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        .speech-bubble.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        /* #chatButton entfernt, da jetzt Bootstrap-Klassen verwendet werden */
+
+        #chatModal .modal-dialog {
+            max-width: 600px;
+        }
+
+        #chatMessages {
+            height: 300px;
+            overflow-y: auto;
+            background: #f1f1f1;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .chat-message {
+            margin-bottom: 0.75rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .chat-user {
+            background: #d1e7dd;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .chat-bot {
+            background: #e2e3e5;
+            align-self: flex-start;
+            margin-right: auto;
+        }
+
+        #chatForm {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        #chatForm input {
+            flex: 1;
+        }
     </style>
 </head>
 <body>
-    <header class="d-flex align-items-center justify-content-start px-3">
+    <header class="d-flex align-items-center justify-content-between px-3">
         <img src="{{ url_for('static', filename='img/dj_bennet_logo.png') }}" alt="DJ Bennet Logo" class="logo">
-        <button class="btn btn-outline-light ms-auto" data-bs-toggle="modal" data-bs-target="#configModal" style="margin-left:auto;">
+        <button class="btn btn-outline-light ms-auto" data-bs-toggle="modal" data-bs-target="#configModal">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
                 <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
                 <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.159c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.469l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
+            </svg>
+        </button>
+        <button id="chatButton" class="btn btn-outline-light ms-2" data-bs-toggle="modal" data-bs-target="#chatModal" title="Musik-Chat">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-chat-dots" viewBox="0 0 16 16">
+              <path d="M2 2a2 2 0 0 0-2 2v7.586a1 1 0 0 0 1.707.707L4.414 10H14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2zm2.5 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
             </svg>
         </button>
     </header>
@@ -196,41 +254,146 @@
             location.reload();
         });
     </script>
-    <script>
-      document.querySelectorAll('.reason-badge').forEach(badge => {
-        badge.addEventListener('click', async () => {
-          // Entferne alle existierenden Begründungsboxen
-          document.querySelectorAll('[id^="reason-box-"]').forEach(el => el.remove());
-
-          const id = badge.getAttribute('data-id');
-          const originalContent = badge.textContent;
-          badge.innerHTML = `<div class="spinner-border spinner-border-sm text-light" role="status"><span class="visually-hidden">Loading...</span></div>`;
-
-          try {
-            const res = await fetch(`/reason/${id}`);
-            const data = await res.json();
-            const reasonText = data.reason || 'Keine Begründung verfügbar.';
-
-            // Zurücksetzen
-            badge.textContent = originalContent;
-
-            const reasonBox = document.createElement('div');
-            reasonBox.className = 'border rounded p-2 mt-1 text-muted small';
-            reasonBox.style.background = '#f9f9f9';
-            reasonBox.style.borderColor = '#ccc';
-            reasonBox.id = `reason-box-${id}`;
-            reasonBox.textContent = reasonText;
-
-            // Füge das Feld direkt über dem Badge ein
-            const row = badge.closest('td');
-            row.appendChild(reasonBox);
-
-          } catch (e) {
-            badge.textContent = originalContent;
-            alert('Fehler beim Laden der Begründung.');
-          }
-        });
+  <script>
+    document.addEventListener('click', (event) => {
+      // Schließe alle offenen Sprechblasen mit Animation, wenn außerhalb geklickt wurde
+      document.querySelectorAll('.speech-bubble').forEach(el => {
+        el.classList.remove('show');
+        setTimeout(() => el.remove(), 300);
       });
-    </script>
+    });
+
+    document.querySelectorAll('.reason-badge').forEach(badge => {
+      badge.addEventListener('click', async (e) => {
+        e.stopPropagation(); // Verhindere Schließen bei Klick auf das Badge
+
+        // Entferne alle existierenden Sprechblasen
+        document.querySelectorAll('.speech-bubble').forEach(el => el.remove());
+
+        const id = badge.getAttribute('data-id');
+        const originalContent = badge.textContent;
+        badge.innerHTML = `<div class="spinner-border spinner-border-sm text-light" role="status"><span class="visually-hidden">Loading...</span></div>`;
+
+        try {
+          const res = await fetch(`/reason/${id}`);
+          const data = await res.json();
+          const reasonText = data.reason || 'Keine Begründung verfügbar.';
+
+          badge.textContent = originalContent;
+
+          const bubble = document.createElement('div');
+          bubble.className = 'speech-bubble';
+          bubble.textContent = reasonText;
+
+          const rect = badge.getBoundingClientRect();
+          const top = rect.top + window.scrollY - 50;
+          const left = rect.left + window.scrollX + rect.width / 2;
+
+          bubble.style.position = 'absolute';
+          bubble.style.top = `${top}px`;
+          bubble.style.left = `${left}px`;
+          bubble.style.transform = 'translateX(-50%) translateY(-10px)';
+          bubble.style.border = '1px solid #ccc';
+          bubble.style.borderRadius = '6px';
+          bubble.style.padding = '0.5rem';
+          bubble.style.boxShadow = '0 2px 6px rgba(0,0,0,0.1)';
+          bubble.style.zIndex = '1050';
+          bubble.style.maxWidth = '250px';
+          bubble.style.fontSize = '0.85rem';
+
+          document.body.appendChild(bubble);
+
+          // Trigger animation
+          requestAnimationFrame(() => {
+            bubble.classList.add('show');
+          });
+        } catch (e) {
+          badge.textContent = originalContent;
+          alert('Fehler beim Laden der Begründung.');
+        }
+      });
+    });
+  </script>
+  <script>
+  function formatMarkdown(text) {
+    return text
+      .replace(/^### (.+)$/gm, '<h4>$1</h4>')
+      .replace(/^## (.+)$/gm, '<h3>$1</h3>')
+      .replace(/^# (.+)$/gm, '<h2>$1</h2>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/\n/g, '<br>');
+  }
+  </script>
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const chatForm = document.getElementById('chatForm');
+    const chatInput = document.getElementById('chatInput');
+    const chatMessages = document.getElementById('chatMessages');
+
+    if (!chatForm || !chatInput || !chatMessages) return;
+
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const userMsg = chatInput.value.trim();
+      if (!userMsg) return;
+
+      const userDiv = document.createElement('div');
+      userDiv.className = 'chat-message chat-user';
+      userDiv.textContent = userMsg;
+      chatMessages.appendChild(userDiv);
+
+      chatInput.value = '';
+      chatInput.disabled = true;
+
+      const botDiv = document.createElement('div');
+      botDiv.className = 'chat-message chat-bot';
+      botDiv.innerHTML = '<div class="spinner-border text-secondary" role="status"><span class="visually-hidden">Lade...</span></div>';
+      chatMessages.appendChild(botDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      try {
+        const previousMessages = Array.from(chatMessages.querySelectorAll('.chat-message')).map(el => ({
+          role: el.classList.contains('chat-user') ? 'user' : 'assistant',
+          content: el.textContent
+        }));
+
+        const res = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: previousMessages })
+        });
+
+        const data = await res.json();
+        botDiv.innerHTML = formatMarkdown(data.response || 'Keine Antwort erhalten.');
+      } catch (err) {
+        botDiv.textContent = 'Fehler bei der Anfrage.';
+      } finally {
+        chatInput.disabled = false;
+        chatInput.focus();
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+    });
+  });
+  </script>
+  <div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content" style="background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+        <div class="modal-header" style="border-bottom: 1px solid #ddd;">
+          <h5 class="modal-title" id="chatModalLabel" style="font-family: 'Orbitron', sans-serif;">Musik- & DJ-Chat</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
+        </div>
+        <div class="modal-body d-flex flex-column" id="chatMessages" style="height: 300px; overflow-y: auto; background: #f8f9fa; border-radius: 8px; padding: 1rem;">
+          <!-- Chatverlauf -->
+        </div>
+        <div class="modal-footer" style="border-top: 1px solid #ddd;">
+          <form id="chatForm" class="d-flex w-100" onsubmit="return false;">
+            <input type="text" id="chatInput" class="form-control me-2" placeholder="Frage etwas über DJing oder Musik..." required>
+            <button type="submit" class="btn btn-dark">Senden</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

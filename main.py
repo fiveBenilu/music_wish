@@ -20,50 +20,48 @@ def genre_vorschlag(title, author):
         context = ""
 
     prompt = f"""Eventbeschreibung & bevorzugte Genres: {context}
-Soll der folgende Musikwunsch auf dein Event passen? Gib nur 'geeignet' oder 'ungeeignet' zurück.
-Song: '{title}' von '{author}'
-"""
+
+    Song: '{title}' von '{author}'
+
+    Bewerte den Song im Kontext der Eventbeschreibung und prüf seine Eignung. Antworte danach ausschließlich mit genau einem Wort: entweder 'geeignet' oder 'ungeeignet'. Keine Erklärungen, kein Kontext, keine Einleitung. Nur dieses eine Wort."""
+
+    api_key = os.getenv("NVIDIA_API_KEY")
+    invoke_url = "https://integrate.api.nvidia.com/v1/chat/completions"
+    stream = False
 
     headers = {
         "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
+        "Accept": "text/event-stream" if stream else "application/json"
     }
 
-    models = [
-        "google/gemini-2.0-flash-exp:free",
-        "meta-llama/llama-3.3-8b-instruct:free",
-        "google/gemma-3n-e4b-it:free",
-        "deepseek/deepseek-r1-0528:free",
-        "mistralai/devstral-small:free",
-        "microsoft/phi-4-reasoning:free"
-    ]
+    payload = {
+        "model": "meta/llama-3.3-70b-instruct",
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": 512,
+        "temperature": 1.00,
+        "top_p": 1.00,
+        "frequency_penalty": 0.00,
+        "presence_penalty": 0.00,
+        "stream": stream
+    }
 
-    for model in models:
-        data = {
-            "model": model,
-            "messages": [
-                {"role": "user", "content": prompt}
-            ]
-        }
-        try:
-            print(f"Versuche Modell: {model}")
-            response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
-            if response.ok:
-                content = response.json()['choices'][0]['message']['content'].strip().lower()
-                print("Antwort der KI:", response.json()['choices'][0]['message']['content'].strip())
-                print(f"{model} antwortet: {content}")
-                if content == "ungeeignet":
-                    return "ungeeignet"
-                elif content == "geeignet":
-                    return "geeignet"
-                else:
-                    print("Unklare oder fehlerhafte Antwort:", content)
+    try:
+        response = requests.post(invoke_url, headers=headers, json=payload)
+        if response.ok:
+            content = response.json()['choices'][0]['message']['content'].strip().lower()
+            print("Antwort der KI:", content)
+            if content == "ungeeignet":
+                return "ungeeignet"
+            elif content == "geeignet":
+                return "geeignet"
             else:
-                print(f"Fehler bei Modell {model}:", response.text)
-        except Exception as e:
-            print(f"Fehler bei Modell {model}: {e}")
-            if response is not None:
-                print("Fehlerhafte Antwort:", response.text)
+                print("Unklare oder fehlerhafte Antwort:", content)
+        else:
+            print("Fehlerhafte Antwort:", response.text)
+    except Exception as e:
+        print(f"Fehler bei NVIDIA API: {e}")
+        if response is not None:
+            print("Fehlerhafte Antwort:", response.text)
     return "ungeeignet"
 
 
@@ -79,42 +77,41 @@ def ki_begruendung(title, author):
         context = ""
 
     prompt = f"""Eventbeschreibung & bevorzugte Genres: {context}
-Begründe in einem Satz, warum der folgende Song für das Event geeignet oder ungeeignet ist:
+# Gib einen geeigneten Alternativsong in dem Format "Ähnlicher geeigneter Titel: (Song - Interpret) \n                       ", wenn der Titel ungeeignet ist und begründe danach in einem Satz, warum der folgende Song für das Event geeignet oder ungeeignet ist:
 '{title}' von '{author}'
 """
 
+    api_key = os.getenv("NVIDIA_API_KEY")
+    invoke_url = "https://integrate.api.nvidia.com/v1/chat/completions"
+    stream = False
+
     headers = {
         "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
+        "Accept": "text/event-stream" if stream else "application/json"
     }
 
-    models = [
-        "google/gemini-2.0-flash-exp:free",
-        "meta-llama/llama-3.3-8b-instruct:free",
-        "google/gemma-3n-e4b-it:free",
-        "deepseek/deepseek-r1-0528:free",
-        "mistralai/devstral-small:free",
-        "microsoft/phi-4-reasoning:free"
-    ]
+    payload = {
+        "model": "meta/llama-3.3-70b-instruct",
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": 512,
+        "temperature": 1.00,
+        "top_p": 1.00,
+        "frequency_penalty": 0.00,
+        "presence_penalty": 0.00,
+        "stream": stream
+    }
 
-    for model in models:
-        data = {
-            "model": model,
-            "messages": [{"role": "user", "content": prompt}]
-        }
-        response = None
-        try:
-            print(f"Begründung mit Modell: {model}")
-            response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
-            if response.ok:
-                reason = response.json()['choices'][0]['message']['content'].strip()
-                return reason
-            else:
-                print(f"Fehler bei Modell {model}:", response.text)
-        except Exception as e:
-            print(f"Fehler bei Modell {model}: {e}")
-            if response is not None:
-                print("Fehlerhafte Antwort:", response.text)
+    try:
+        response = requests.post(invoke_url, headers=headers, json=payload)
+        if response.ok:
+            reason = response.json()['choices'][0]['message']['content'].strip()
+            return reason
+        else:
+            print("Fehlerhafte Antwort:", response.text)
+    except Exception as e:
+        print(f"Fehler bei NVIDIA API: {e}")
+        if response is not None:
+            print("Fehlerhafte Antwort:", response.text)
     return "Limit"
 
 app = Flask(__name__)
@@ -137,6 +134,9 @@ def init_db():
                 classification TEXT DEFAULT 'offen'
             )
         ''')
+
+# Direkt beim Modulstart Initialisierung der DB
+init_db()
 
 def get_client_ip():
     return request.headers.get('X-Forwarded-For', request.remote_addr)
@@ -172,7 +172,7 @@ def index():
         klassifiziere_wunsch(wish_id, title, author)
         socketio.emit('update_wishes')
 
-        return redirect(url_for('index'))
+        return redirect(url_for('index', success='true'))
 
     return render_template('index.html')
 
@@ -228,10 +228,49 @@ def reason(wish_id):
         reason_text = ki_begruendung(title, author)
         if reason_text == "Limit":
             with sqlite3.connect(DB_PATH) as conn:
-                conn.execute("UPDATE wishes SET classification = ? WHERE id = ?", ("Limit", wish_id))
+                #conn.execute("UPDATE wishes SET classification = ? WHERE id = ?", ("Limit", wish_id))
+                pass
         return jsonify({'reason': reason_text})
 
+# Chat-Antwort auf Musik- und DJ-Fragen
+@app.route('/chat', methods=['POST'])
+def chat():
+    data = request.get_json()
+    messages = data.get('messages', [])
+    if not messages:
+        return jsonify({'response': 'Bitte stelle eine gültige Frage.'}), 400
+
+    api_key = os.getenv("NVIDIA_API_KEY")
+    invoke_url = "https://integrate.api.nvidia.com/v1/chat/completions"
+    stream = False
+
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Accept": "application/json"
+    }
+
+    payload = {
+        "model": "meta/llama-3.3-70b-instruct",
+        "messages": [{"role": "system", "content": "Du bist ein erfahrener DJ und Musikexperte. Antworte informativ, hilfreich und mit einem freundlichen Ton. Versuche dich außerdem kurz zu halten und antworte anhand von Fakten. Ich heiße Bennet also nenn mich auch so."}] + messages,
+        "max_tokens": 500,
+        "temperature": 0.9,
+        "top_p": 1.0,
+        "frequency_penalty": 0,
+        "presence_penalty": 0,
+        "stream": stream
+    }
+
+    try:
+        response = requests.post(invoke_url, headers=headers, json=payload)
+        if response.ok:
+            content = response.json()['choices'][0]['message']['content'].strip()
+            return jsonify({'response': content})
+        else:
+            print("Fehlerhafte Antwort:", response.text)
+            return jsonify({'response': 'Fehler beim Abruf der KI-Antwort.'}), 500
+    except Exception as e:
+        print("Fehler bei Chat-Antwort:", e)
+        return jsonify({'response': 'Fehler bei der Verarbeitung deiner Anfrage.'}), 500
+
 if __name__ == '__main__':
-    if not os.path.exists(DB_PATH):
-        init_db()
     socketio.run(app, debug=True)
