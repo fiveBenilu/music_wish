@@ -1,4 +1,4 @@
-Sure! Here’s your README.md in English for GitHub:
+
 
 # 🎵 MusicRecommendationEngine – DJ Bennet's Music Request System
 
@@ -70,7 +70,7 @@ You can modify them in the main.py or extend the login logic.
 
 📄 License
 
-MIT License – free to use and modify.
+GPLv3 License – free to use and modify.
 
 ⸻
 
